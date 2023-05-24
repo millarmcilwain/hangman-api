@@ -2,8 +2,9 @@ const { v4: uuid } = require("uuid");
 
 const words = ["Banana", "Canine", "Unosquare", "Airport"];
 const games = {};
+const GUESS_LIMIT= 6;
 
-const retrieveWord = () => words[Math.floor(Math.random(words.length - 1))];
+const retrieveWord = () => words[Math.floor(Math.random()*words.length)];
 
 const clearUnmaskedWord = (game) => {
     const withoutUnmasked = { 
@@ -14,7 +15,7 @@ const clearUnmaskedWord = (game) => {
 }
 
 
-function createGame(req, res) {
+const createGame = (req, res) => {
   const newGameWord = retrieveWord();
   const newGameId = uuid();
   const newGame = {
@@ -27,6 +28,7 @@ function createGame(req, res) {
 
   games[newGameId] = newGame;
 
+  console.log(games)
   res.send(newGameId);
 }
 
