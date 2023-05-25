@@ -1,17 +1,18 @@
 name: Jest Unit Tests
 
-on: 
+on:
   push:
-    branches: 
-    - main
-    
+    branches:
+      - main
+  pull_request:
+    branches: [main]
 
 jobs:
   Jest:
     runs-on: windows-latest
-    steps: 
-    - uses: actions/checkout@v1
-    - name: Run Tests
-    run: |
-        npm install
-        npm test
+    steps:
+      - uses: actions/checkout@v1
+      - name: Run Tests
+        run: |
+          npm install 
+          npm test
