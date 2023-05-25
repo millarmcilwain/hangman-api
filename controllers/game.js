@@ -41,13 +41,16 @@ function getGame(req, res) {
   res.status(200).json(clearUnmaskedWord(game));
 }
 
-function createGuess(req, res) {
+const createGuess = (req, res) => {
   const { gameId } = req.params;
   const { letter } = req.body;
 
-  if (!gameId) return res.sendStatus(404);
+  if (!gameId) return res.sendStatus(404).json({
+    Message: 'A Game ID must be provided in the URL paramaters in order to submit a guess'
+  });
 
   var game = games[gameId];
+
   if (!game) return res.sendStatus(404);
 
   if (!letter || letter.length != 1) {
@@ -56,12 +59,31 @@ function createGuess(req, res) {
     });
   }
 
+
+
+  if (checkUserGuessAgainstGame(game, letter.toLowerCase())) {
+  return res.status(200).json({ remainingGuesses: game.remainingGuesses,
+    word: game.word.replaceAll(/[a-zA-Z0-9]/g, '_'),
+    status: 'In Progress',
+    incorrectGuesses: game.incorrectGuesses, })
+    } else {
+        //decrement user guess
+        return res.status(200).json({ message: 'b' });
+    };
+
   
 
-  // todo: add logic for making a guess, modifying the game and updating the status
-
-  return res.status(200).json(clearUnmaskedWord(game));
+  //return res.status(200).json(clearUnmaskedWord(game));
 }
+
+const checkUserGuessAgainstGame = (game, letter) =>{
+    if (game.unmaskedWord.includes(letter)) {
+        return true;
+      } else {
+        return false;
+      }
+}
+
 
 //check if body exists, convert to lower case, check body length? only take first value ensure letter value exists
 
@@ -74,6 +96,8 @@ const verifyGameID = (req, res, next) => {
         Message: 'Game ID does not exist.',
       });
 };
+
+
 
 
 

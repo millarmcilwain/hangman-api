@@ -55,4 +55,8 @@ describe('game controller', () => {
     });
 
   });
+
+  describe('checkUserGuessAgainstGame', ()=> {
+    
+  })
 });
