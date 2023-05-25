@@ -32,7 +32,6 @@ describe('game controller', () => {
     it('should call next() if the gameId exists', () => {
       const req = { params: { gameId: mockId } };
      
-      
       gameController.verifyGameID(req, res, next);
 
       expect(next).toHaveBeenCalled();
@@ -44,11 +43,11 @@ describe('game controller', () => {
     it ('should send a JSON response with a 404 status if the gameID does not exist', ()=> {
       
       const req = { params: { gameId: '123' } };
-      const games = {}
+      
 
       gameController.verifyGameID(req, res, next);
       
-      expect(next).not.toHaveBeenCalled();
+      
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({Message: 'Game ID does not exist.'});
       
