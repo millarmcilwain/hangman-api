@@ -61,7 +61,7 @@ const createGuess = (req, res) => {
 
 
 
-  if (checkUserGuessAgainstGame(game, letter.toLowerCase())) {
+  if (checkLetterAgainstGame(game, letter.toLowerCase())) {
   return res.status(200).json({ remainingGuesses: game.remainingGuesses,
     word: game.word.replaceAll(/[a-zA-Z0-9]/g, '_'),
     status: 'In Progress',
@@ -76,7 +76,7 @@ const createGuess = (req, res) => {
   //return res.status(200).json(clearUnmaskedWord(game));
 }
 
-const checkUserGuessAgainstGame = (game, letter) =>{
+const checkLetterAgainstGame = (game, letter) =>{
     if (game.unmaskedWord.includes(letter)) {
         return true;
       } else {
@@ -107,4 +107,5 @@ module.exports = {
   getGame,
   createGuess,
   verifyGameID,
+  checkLetterAgainstGame
 };

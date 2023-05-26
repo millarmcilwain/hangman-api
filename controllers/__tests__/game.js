@@ -56,7 +56,35 @@ describe('game controller', () => {
 
   });
 
-  describe('checkUserGuessAgainstGame', ()=> {
-    
+  describe('checkLetterAgainstGame', ()=> {
+
+    const newGameWord = 'Banana'
+    const testLetterTrue = 'a'
+    const testLetterFalse = 'x'
+    const GUESS_LIMIT = 6;
+
+    const testGame = {
+      remainingGuesses: GUESS_LIMIT,
+      unmaskedWord: newGameWord,
+      word: newGameWord.replaceAll(/[a-zA-Z0-9]/g, '_'),
+      status: 'In Progress',
+      incorrectGuesses: [],
+    };
+
+    it('return true if the letter appears in the game chosen word', () => {
+      
+      const result = gameController.checkLetterAgainstGame(testGame, testLetterTrue);
+
+      expect(result).toBeTruthy();
+
+    });
+
+    it('return false if the letter does not appear in the game chosen word', () => {
+      
+      const result = gameController.checkLetterAgainstGame(testGame, testLetterFalse);
+
+      expect(result).toBeFalsy();
+
+    });
   })
 });
