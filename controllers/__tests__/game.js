@@ -66,6 +66,59 @@ describe('game controller', () => {
     });
   });
 
+  describe('verifyGameStatus', ()=> {
+
+    let req;
+    let res;
+    let next;
+
+    beforeEach(() => {
+      req = { params: {} };
+      res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+      next = jest.fn();
+      gameController.games[mockId] = {status: ''};
+    });
+
+  
+    it('should send a JSON response with a 404 status if the game status does not equal "In Progress"', () => {
+      
+      req = { params: { gameId: mockId } };
+      
+      gameController.games[mockId] = {status: 'Won'};
+     
+      gameController.verifyGameStatus(req, res, next);
+      
+      
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({
+        Message:
+        `Game ID: ${mockId} has already been completed`,
+      });
+    });
+
+    it('should call next if game status equa;s "In Progress"', () => {
+      
+      req = { params: { gameId: mockId } };
+      
+      gameController.games[mockId] = {status: 'In Progress'};
+     
+      gameController.verifyGameStatus(req, res, next);
+      
+      
+      expect(next).toHaveBeenCalled();
+      expect(res.status).not.toHaveBeenCalledWith(404);
+      expect(res.json).not.toHaveBeenCalledWith({
+        Message:
+        `Game ID: ${mockId} has already been completed`,
+      });
+    });
+
+  });
+
   describe('checkLetterAgainstGame', () => {
     const newGameWord = 'Banana';
     const testLetterTrue = 'a';
@@ -94,7 +147,6 @@ describe('game controller', () => {
         testGame,
         testLetterFalse
       );
-
       expect(result).toBeFalsy();
     });
   });
