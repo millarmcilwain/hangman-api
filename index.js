@@ -13,6 +13,6 @@ app.use(urlencoded({ extended: true }));
 
 app.post("/games", gamesController.createGame);
 app.get("/games/:gameId", gamesController.verifyGameID, gamesController.getGame);
-app.post("/games/:gameId/guesses",gamesController.verifyGameID, gamesController.createGuess);
+app.post("/games/:gameId/guesses",gamesController.verifyGameID, gamesController.verifyGameStatus, gamesController.createGuess);
 
 app.listen(4567);

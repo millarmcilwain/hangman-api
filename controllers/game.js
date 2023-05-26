@@ -55,14 +55,12 @@ const createGuess = (req, res) => {
   }
 
   if (checkLetterAgainstGame(game, letter.toLowerCase())) {
-    return res
-      .status(200)
-      .json({
-        remainingGuesses: game.remainingGuesses,
-        word: game.word.replaceAll(/[a-zA-Z0-9]/g, '_'),
-        status: 'In Progress',
-        incorrectGuesses: game.incorrectGuesses,
-      });
+    return res.status(200).json({
+      remainingGuesses: game.remainingGuesses,
+      word: game.word.replaceAll(/[a-zA-Z0-9]/g, '_'),
+      status: 'In Progress',
+      incorrectGuesses: game.incorrectGuesses,
+    });
   } else {
     //decrement user guess
     return res.status(200).json({ message: 'b' });
@@ -93,7 +91,7 @@ const verifyGameID = (req, res, next) => {
   if (Object.hasOwn(games, gameId)) {
     next();
   } else {
-    res.status(404).json({
+    return res.status(404).json({
       Message: 'Game ID does not exist.',
     });
   }
@@ -101,6 +99,14 @@ const verifyGameID = (req, res, next) => {
 
 const verifyGameStatus = (req, res, next) => {
   const { gameId } = req.params;
+  
+  if (!games[gameId] || !games[gameId].status || games[gameId].status !== 'In Progress') {
+    return res.status(404).json({
+      Message: `Game ID: ${ gameId } has already been completed`,
+    });
+  } else {
+    next();
+  }
 };
 
 module.exports = {
@@ -110,4 +116,5 @@ module.exports = {
   createGuess,
   verifyGameID,
   checkLetterAgainstGame,
+  verifyGameStatus,
 };
