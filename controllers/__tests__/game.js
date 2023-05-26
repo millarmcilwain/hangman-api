@@ -125,20 +125,18 @@ describe('game controller', () => {
     };
 
     it('return true if the letter appears in the game chosen word', () => {
-      const result = gameController.checkLetterAgainstGame(
+      expect(gameController.checkLetterAgainstGame(
         testGame,
         testLetterTrue
-      );
-
-      expect(result).toBeTruthy();
+      )).toBeTruthy();
     });
 
     it('return false if the letter does not appear in the game chosen word', () => {
-      const result = gameController.checkLetterAgainstGame(
+     
+      expect(gameController.checkLetterAgainstGame(
         testGame,
         testLetterFalse
-      );
-      expect(result).toBeFalsy();
+      )).toBeFalsy();
     });
   });
 
@@ -148,34 +146,42 @@ describe('game controller', () => {
     const testLetter2 = 'b';
 
     it('should return an array containing the array indexes of the letter "a" in "Banana"', () => {
-      const result = gameController.returnIndexArrayMatchingCharacters(
+  
+      expect(gameController.returnIndexArrayMatchingCharacters(
         string,
         testLetter1
-      );
-      expect(result).toStrictEqual([1, 3, 5]);
+      )).toStrictEqual([1, 3, 5]);
     });
 
     it('should return an array containing the array indexes of the letter "b" in "Banana"', () => {
-      const result = gameController.returnIndexArrayMatchingCharacters(
-        string,
-        testLetter2
-      );
-      expect(result).toStrictEqual([0]);
+      expect(
+        gameController.returnIndexArrayMatchingCharacters(string, testLetter2)
+      ).toStrictEqual([0]);
     });
-
   });
 
-  describe('updateMaskedGameWord', ()=> {
-    it ('return the masked word banana with only the character "a" showing', ()=> {
-       
-        const letter = 'a'
-        const indexes = [1,3,5]
-        const games =  { word: '_____'} ;
+  describe('updateMaskedGameWord', () => {
+    it('return the masked word banana with only the character "a" showing', () => {
+      const letter = 'a';
+      const indexes = [1, 3, 5];
+      const games = { word: '_____' };
 
       gameController.updateMaskedGameWord(indexes, letter, games);
 
+      expect(games.word).toBe('_a_a_a');
+    });
+  });
 
-  expect(games.word).toBe('_a_a_a');
-    })
-  })
+  describe('checkWordCompletion', () => {
+    const testWord1 = 'Banana';
+    const testWord2 = '_anana';
+
+    it('should return true if an underscore is present in the word', () => {
+      expect(gameController.checkWordCompletion(testWord1)).toBeTruthy;
+    });
+
+    it('should return false if an underscore is not present in the word', () => {
+      expect(gameController.checkWordCompletion(testWord2)).toBeFalsy;
+    });
+  });
 });
