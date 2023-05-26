@@ -104,14 +104,14 @@ const updateMaskedGameWord = (indexes, letter, game) => {
 
 
 
-const updateGameDetails = () => {
-  return new Promise((resolve, reject) => {
-    try {
-    } catch (err) {
-      reject(err);
-    }
-  });
-};
+// const updateGameDetails = () => {
+//   return new Promise((resolve, reject) => {
+//     try {
+//     } catch (err) {
+//       reject(err);
+//     }
+//   });
+// };
 
 //check if body exists, convert to lower case, check body length? only take first value ensure letter value exists
 
