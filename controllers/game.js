@@ -31,7 +31,6 @@ const createGame = (req, res) => {
 
 function getGame(req, res) {
   const { gameId } = req.params;
-  if (!gameId) return res.sendStatus(404);
 
   var game = games[gameId];
   if (!game) {
@@ -45,10 +44,6 @@ const createGuess = (req, res) => {
   const { gameId } = req.params;
   const { letter } = req.body;
 
-  if (!gameId) return res.sendStatus(404).json({
-    Message: 'A Game ID must be provided in the URL paramaters in order to submit a guess'
-  });
-
   var game = games[gameId];
 
   if (!game) return res.sendStatus(404);
@@ -59,47 +54,54 @@ const createGuess = (req, res) => {
     });
   }
 
-
-
   if (checkLetterAgainstGame(game, letter.toLowerCase())) {
-  return res.status(200).json({ remainingGuesses: game.remainingGuesses,
-    word: game.word.replaceAll(/[a-zA-Z0-9]/g, '_'),
-    status: 'In Progress',
-    incorrectGuesses: game.incorrectGuesses, })
-    } else {
-        //decrement user guess
-        return res.status(200).json({ message: 'b' });
-    };
-
-  
+    return res
+      .status(200)
+      .json({
+        remainingGuesses: game.remainingGuesses,
+        word: game.word.replaceAll(/[a-zA-Z0-9]/g, '_'),
+        status: 'In Progress',
+        incorrectGuesses: game.incorrectGuesses,
+      });
+  } else {
+    //decrement user guess
+    return res.status(200).json({ message: 'b' });
+  }
 
   //return res.status(200).json(clearUnmaskedWord(game));
-}
+};
 
-const checkLetterAgainstGame = (game, letter) =>{
-    if (game.unmaskedWord.includes(letter)) {
-        return true;
-      } else {
-        return false;
-      }
-}
-
+const checkLetterAgainstGame = (game, letter) => {
+  if (game.unmaskedWord.includes(letter)) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
 //check if body exists, convert to lower case, check body length? only take first value ensure letter value exists
 
 const verifyGameID = (req, res, next) => {
   const { gameId } = req.params;
 
-  Object.hasOwn(games, gameId)
-    ? next()
-    : res.status(404).json({
-        Message: 'Game ID does not exist.',
-      });
+  if (!gameId)
+    return res.status(404).json({
+      Message:
+        'A Game ID must be provided in the URL paramaters in order to check game information or submit a guess',
+    });
+
+  if (Object.hasOwn(games, gameId)) {
+    next();
+  } else {
+    res.status(404).json({
+      Message: 'Game ID does not exist.',
+    });
+  }
 };
 
-
-
-
+const verifyGameStatus = (req, res, next) => {
+  const { gameId } = req.params;
+};
 
 module.exports = {
   games,
@@ -107,5 +109,5 @@ module.exports = {
   getGame,
   createGuess,
   verifyGameID,
-  checkLetterAgainstGame
+  checkLetterAgainstGame,
 };
