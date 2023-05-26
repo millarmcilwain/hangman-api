@@ -66,8 +66,7 @@ describe('game controller', () => {
     });
   });
 
-  describe('verifyGameStatus', ()=> {
-
+  describe('verifyGameStatus', () => {
     let req;
     let res;
     let next;
@@ -79,44 +78,36 @@ describe('game controller', () => {
         json: jest.fn(),
       };
       next = jest.fn();
-      gameController.games[mockId] = {status: ''};
+      gameController.games[mockId] = { status: '' };
     });
 
-  
     it('should send a JSON response with a 404 status if the game status does not equal "In Progress"', () => {
-      
       req = { params: { gameId: mockId } };
-      
-      gameController.games[mockId] = {status: 'Won'};
-     
+
+      gameController.games[mockId] = { status: 'Won' };
+
       gameController.verifyGameStatus(req, res, next);
-      
-      
+
       expect(next).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
-        Message:
-        `Game ID: ${mockId} has already been completed`,
+        Message: `Game ID: ${mockId} has already been completed`,
       });
     });
 
     it('should call next if game status equa;s "In Progress"', () => {
-      
       req = { params: { gameId: mockId } };
-      
-      gameController.games[mockId] = {status: 'In Progress'};
-     
+
+      gameController.games[mockId] = { status: 'In Progress' };
+
       gameController.verifyGameStatus(req, res, next);
-      
-      
+
       expect(next).toHaveBeenCalled();
       expect(res.status).not.toHaveBeenCalledWith(404);
       expect(res.json).not.toHaveBeenCalledWith({
-        Message:
-        `Game ID: ${mockId} has already been completed`,
+        Message: `Game ID: ${mockId} has already been completed`,
       });
     });
-
   });
 
   describe('checkLetterAgainstGame', () => {
@@ -150,4 +141,41 @@ describe('game controller', () => {
       expect(result).toBeFalsy();
     });
   });
+
+  describe('returnIndexArrayMatchingCharacters', () => {
+    const string = 'banana';
+    const testLetter1 = 'a';
+    const testLetter2 = 'b';
+
+    it('should return an array containing the array indexes of the letter "a" in "Banana"', () => {
+      const result = gameController.returnIndexArrayMatchingCharacters(
+        string,
+        testLetter1
+      );
+      expect(result).toStrictEqual([1, 3, 5]);
+    });
+
+    it('should return an array containing the array indexes of the letter "b" in "Banana"', () => {
+      const result = gameController.returnIndexArrayMatchingCharacters(
+        string,
+        testLetter2
+      );
+      expect(result).toStrictEqual([0]);
+    });
+
+  });
+
+  describe('updateMaskedGameWord', ()=> {
+    it ('return the masked word banana with only the character "a" showing', ()=> {
+       
+        const letter = 'a'
+        const indexes = [1,3,5]
+        const games =  { word: '_____'} ;
+
+      gameController.updateMaskedGameWord(indexes, letter, games);
+
+
+  expect(games.word).toBe('_a_a_a');
+    })
+  })
 });

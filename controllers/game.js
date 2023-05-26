@@ -54,7 +54,10 @@ const createGuess = (req, res) => {
     });
   }
 
-  if (checkLetterAgainstGame(game, letter.toLowerCase())) {
+  if (checkLetterAgainstGame(game, letter)) {
+
+    const lettersToReplace = returnIndexArrayMatchingCharacters(game.word.toLowerCase(), letter.toLowerCase())
+
     return res.status(200).json({
       remainingGuesses: game.remainingGuesses,
       word: game.word.replaceAll(/[a-zA-Z0-9]/g, '_'),
@@ -75,6 +78,39 @@ const checkLetterAgainstGame = (game, letter) => {
   } else {
     return false;
   }
+};
+
+const returnIndexArrayMatchingCharacters = (string, character) => {
+  let indexes = [];
+
+  for (i = 0; i <= string.length; i++) {
+    if (string.charAt(i) == character) {
+      indexes.push(i);
+    }
+  }
+  return indexes;
+};
+
+const updateMaskedGameWord = (indexes, letter, game) => {
+
+  const wordArray=game.word.split('');
+
+  indexes.forEach(letterIndex => {
+    wordArray[letterIndex] = letter;
+  });
+
+  game.word = wordArray.join('');
+}
+
+
+
+const updateGameDetails = () => {
+  return new Promise((resolve, reject) => {
+    try {
+    } catch (err) {
+      reject(err);
+    }
+  });
 };
 
 //check if body exists, convert to lower case, check body length? only take first value ensure letter value exists
@@ -99,10 +135,14 @@ const verifyGameID = (req, res, next) => {
 
 const verifyGameStatus = (req, res, next) => {
   const { gameId } = req.params;
-  
-  if (!games[gameId] || !games[gameId].status || games[gameId].status !== 'In Progress') {
+
+  if (
+    !games[gameId] ||
+    !games[gameId].status ||
+    games[gameId].status !== 'In Progress'
+  ) {
     return res.status(404).json({
-      Message: `Game ID: ${ gameId } has already been completed`,
+      Message: `Game ID: ${gameId} has already been completed`,
     });
   } else {
     next();
@@ -117,4 +157,6 @@ module.exports = {
   verifyGameID,
   checkLetterAgainstGame,
   verifyGameStatus,
+  returnIndexArrayMatchingCharacters,
+  updateMaskedGameWord
 };
