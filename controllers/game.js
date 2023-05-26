@@ -44,7 +44,7 @@ const createGuess = (req, res) => {
   const { gameId } = req.params;
   const { letter } = req.body;
 
-  var game = games[gameId];
+  let game = games[gameId];
 
   if (!game) return res.sendStatus(404);
 
@@ -55,21 +55,28 @@ const createGuess = (req, res) => {
   }
 
   if (checkLetterAgainstGame(game, letter)) {
+    const lettersToReplace = returnIndexArrayMatchingCharacters(
+      game.unmaskedWord.toLowerCase(),
+      letter.toLowerCase()
+    );
 
-    const lettersToReplace = returnIndexArrayMatchingCharacters(game.word.toLowerCase(), letter.toLowerCase())
-
-    return res.status(200).json({
-      remainingGuesses: game.remainingGuesses,
-      word: game.word.replaceAll(/[a-zA-Z0-9]/g, '_'),
-      status: 'In Progress',
-      incorrectGuesses: game.incorrectGuesses,
-    });
+    updateMaskedGameWord(lettersToReplace, letter, game);
+    
+    if (!checkWordCompletion(game.word)) {
+      game.status = 'Won'
+    
+    return res.status(200).json({...clearUnmaskedWord(game),
+    message: 'Winner! Well done!'});
+    } else {
+    return res.status(200).json(clearUnmaskedWord(game));
+  }
   } else {
     //decrement user guess
-    return res.status(200).json({ message: 'b' });
+    return res.status(200).json({...clearUnmaskedWord(game),
+      message: 'Incorrect guess! Try again'});
   }
 
-  //return res.status(200).json(clearUnmaskedWord(game));
+  
 };
 
 const checkLetterAgainstGame = (game, letter) => {
@@ -92,26 +99,24 @@ const returnIndexArrayMatchingCharacters = (string, character) => {
 };
 
 const updateMaskedGameWord = (indexes, letter, game) => {
+  let wordArray = game.word.split('');
 
-  const wordArray=game.word.split('');
-
-  indexes.forEach(letterIndex => {
+  indexes.forEach((letterIndex) => {
     wordArray[letterIndex] = letter;
   });
 
   game.word = wordArray.join('');
-}
+};
+
+const checkWordCompletion = (word) => {
+  if (word.includes('_')) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
 
-
-// const updateGameDetails = () => {
-//   return new Promise((resolve, reject) => {
-//     try {
-//     } catch (err) {
-//       reject(err);
-//     }
-//   });
-// };
 
 //check if body exists, convert to lower case, check body length? only take first value ensure letter value exists
 
@@ -158,5 +163,6 @@ module.exports = {
   checkLetterAgainstGame,
   verifyGameStatus,
   returnIndexArrayMatchingCharacters,
-  updateMaskedGameWord
+  updateMaskedGameWord,
+  checkWordCompletion
 };
