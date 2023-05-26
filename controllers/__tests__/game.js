@@ -184,4 +184,23 @@ describe('game controller', () => {
       expect(gameController.checkWordCompletion(testWord2)).toBeFalsy;
     });
   });
+
+  describe('checkAndDecrementGuessTotal', ()=>{
+
+    beforeEach(() => {
+      gameController.games[mockId]={remainingGuesses:{}}
+    });
+
+    it('should decrement game.remainingGuesses by 1 and return true if game.remainingGuesses is greater than 0',()=>{
+      gameController.games[mockId].remainingGuesses=2;
+      expect(gameController.checkAndDecrementGuessTotal(gameController.games[mockId])).toBeTruthy;
+      expect(gameController.games[mockId].remainingGuesses).toStrictEqual(1);
+    });
+
+    it('should decrement game.remainingGuesses by 1 and return false when game.remainingGuesses is equal to 0',()=>{
+      gameController.games[mockId].remainingGuesses=1;
+      expect(gameController.checkAndDecrementGuessTotal(gameController.games[mockId])).toBeTruthy;
+      expect(gameController.games[mockId].remainingGuesses).toStrictEqual(0);
+    });
+  });
 });

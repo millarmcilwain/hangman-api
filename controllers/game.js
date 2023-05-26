@@ -61,22 +61,31 @@ const createGuess = (req, res) => {
     );
 
     updateMaskedGameWord(lettersToReplace, letter, game);
-    
-    if (!checkWordCompletion(game.word)) {
-      game.status = 'Won'
-    
-    return res.status(200).json({...clearUnmaskedWord(game),
-    message: 'Winner! Well done!'});
-    } else {
-    return res.status(200).json(clearUnmaskedWord(game));
-  }
-  } else {
-    //decrement user guess
-    return res.status(200).json({...clearUnmaskedWord(game),
-      message: 'Incorrect guess! Try again'});
-  }
 
-  
+    if (!checkWordCompletion(game.word)) {
+      game.status = 'Won';
+
+      return res
+        .status(200)
+        .json({ ...clearUnmaskedWord(game), message: 'Winner! Well done!' });
+    } else {
+      return res.status(200).json(clearUnmaskedWord(game));
+    }
+  } else {
+    if (checkAndDecrementGuessTotal(game)) {
+      return res
+        .status(200)
+        .json({
+          ...clearUnmaskedWord(game),
+          message: 'Incorrect guess! Try again',
+        });
+    } else {
+      game.status = 'Lost'
+      return res
+        .status(200)
+        .json({ ...clearUnmaskedWord(game), message: 'Game lost! Better luck next time!' });
+    }
+  }
 };
 
 const checkLetterAgainstGame = (game, letter) => {
@@ -116,7 +125,16 @@ const checkWordCompletion = (word) => {
   }
 };
 
+const checkAndDecrementGuessTotal = (game) => {
+  
+  game.remainingGuesses--;
 
+  if (game.remainingGuesses > 0) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
 //check if body exists, convert to lower case, check body length? only take first value ensure letter value exists
 
@@ -164,5 +182,6 @@ module.exports = {
   verifyGameStatus,
   returnIndexArrayMatchingCharacters,
   updateMaskedGameWord,
-  checkWordCompletion
+  checkWordCompletion,
+  checkAndDecrementGuessTotal
 };
