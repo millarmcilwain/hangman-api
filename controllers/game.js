@@ -106,7 +106,7 @@ const deleteGame = (req, res) => {
       Message: `Game ID: ${gameId} was successfully removed`,
     });
   } catch (err) {
-    errorResponse(res);
+    //errorResponse(res);
   }
 };
 
