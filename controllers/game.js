@@ -26,7 +26,7 @@ const createGame = (req, res) => {
   };
 
   games[newGameId] = newGame;
-  res.status(201).json({newGameId: newGameId});
+  res.status(201).json({ newGameId: newGameId });
 };
 
 function getGame(req, res) {
@@ -37,7 +37,7 @@ function getGame(req, res) {
     return res.sendStatus(404);
   }
 
-  res.status(200).json(clearUnmaskedWord(game));
+  return res.status(200).json(clearUnmaskedWord(game));
 }
 
 const createGuess = (req, res) => {
@@ -74,9 +74,11 @@ const createGuess = (req, res) => {
       game.status = 'Won';
       return res
         .status(200)
-        .json({ Message: 'Winner! Well done!' , ...clearUnmaskedWord(game), });
+        .json({ Message: 'Winner! Well done!', ...clearUnmaskedWord(game) });
     } else {
-      return res.status(200).json( {Message: 'Correct guess!', ...clearUnmaskedWord(game)});
+      return res
+        .status(200)
+        .json({ Message: 'Correct guess!', ...clearUnmaskedWord(game) });
     }
   } else {
     if (checkAndDecrementGuessTotal(game)) {
@@ -87,16 +89,26 @@ const createGuess = (req, res) => {
       });
     } else {
       game.status = 'Lost';
-      return res
-        .status(200)
-        .json({
-          Message: 'Game lost! Better luck next time!',
-          ...clearUnmaskedWord(game),
-        });
+      return res.status(200).json({
+        Message: 'Game lost! Better luck next time!',
+        ...clearUnmaskedWord(game),
+      });
     }
   }
 };
 
+const deleteGame = (req, res) => {
+  try {
+    const { gameId } = req.params;
+
+    delete games[gameId];
+    return res.status(200).json({
+      Message: `Game ID: ${gameId} was successfully removed`,
+    });
+  } catch (err) {
+    errorResponse(res);
+  }
+};
 
 const checkLetterAgainstGame = (game, letter) => {
   return game.unmaskedWord.toLowerCase().includes(letter);
@@ -115,11 +127,11 @@ const returnIndexArrayMatchingCharacters = (string, character) => {
 
 const updateMaskedGameWord = (indexes, letter, game) => {
   let wordArray = game.word.split('');
-  
+
   indexes.forEach((letterIndex) => {
-    wordArray[letterIndex] = game.unmaskedWord.charAt((letterIndex));
+    wordArray[letterIndex] = game.unmaskedWord.charAt(letterIndex);
   });
-  
+
   game.word = wordArray.join('');
 };
 
@@ -132,8 +144,6 @@ const checkAndDecrementGuessTotal = (game) => {
 
   return game.remainingGuesses > 0;
 };
-
-
 
 //middleware
 const verifyGameID = (req, res, next) => {
@@ -170,6 +180,12 @@ const verifyGameStatus = (req, res, next) => {
   }
 };
 
+const errorResponse = (res) => {
+  return res.status(500).json({
+    Message: 'There was an issue processing this request',
+  });
+};
+
 module.exports = {
   games,
   createGame,
@@ -182,4 +198,5 @@ module.exports = {
   updateMaskedGameWord,
   checkWordCompletion,
   checkAndDecrementGuessTotal,
+  deleteGame
 };

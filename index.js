@@ -14,5 +14,6 @@ app.use(urlencoded({ extended: true }));
 app.post("/games", gamesController.createGame);
 app.get("/games/:gameId", gamesController.verifyGameID, gamesController.getGame);
 app.post("/games/:gameId/guesses",gamesController.verifyGameID, gamesController.verifyGameStatus, gamesController.createGuess);
+app.delete('/games/remove/:gameId/', gamesController.deleteGame);
 
 app.listen(4567);

@@ -35,7 +35,7 @@ describe('game controller', () => {
 
     gameController.games[mockId] = {};
 
-    it('should send a JSON response with a 404 status if the gameID is not present in the request', () => {
+    it('should return a JSON response with a 404 status if the gameID is not present in the request', () => {
       gameController.verifyGameID(req, res, next);
       expect(next).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(404);
@@ -55,7 +55,7 @@ describe('game controller', () => {
       expect(res.json).not.toHaveBeenCalled();
     });
 
-    it('should send a JSON response with a 404 status if the gameID does not exist', () => {
+    it('should return a JSON response with a 404 status if the gameID does not exist', () => {
       req = { params: { gameId: '123' } };
 
       gameController.verifyGameID(req, res, next);
@@ -82,7 +82,7 @@ describe('game controller', () => {
       gameController.games[mockId] = { status: '' };
     });
 
-    it('should send a JSON response with a 404 status if the game status does not equal "In Progress"', () => {
+    it('should return a JSON response with a 404 status if the game status does not equal "In Progress"', () => {
       req = { params: { gameId: mockId } };
 
       gameController.games[mockId] = { status: 'Won' };
@@ -205,5 +205,21 @@ describe('game controller', () => {
       expect(gameController.games[mockId].remainingGuesses).toStrictEqual(0);
     });
   });
+
+  describe('deleteGame', ()=> {
+
+    req = { params: { gameId: mockId } };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    gameController.games[mockId] = {};
+
+    it('should return a JSON response with a 200 status if the game has sucessfully been removed', ()=> {
+      gameController.deleteGame();
+
+      expect(gameController.games).not.toContain(mockId);
+    });
+  })
 
 });
