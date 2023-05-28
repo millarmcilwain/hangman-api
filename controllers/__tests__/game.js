@@ -142,7 +142,7 @@ describe('game controller', () => {
   });
 
   describe('returnIndexArrayMatchingCharacters', () => {
-    const string = 'banana';
+    const string = 'Banana';
     const testLetter1 = 'a';
     const testLetter2 = 'b';
 
@@ -164,12 +164,13 @@ describe('game controller', () => {
   describe('updateMaskedGameWord', () => {
     it('return the masked word banana with only the character "a" showing', () => {
       const letter = 'a';
-      const indexes = [1, 3, 5];
-      const games = { word: '_____' };
+      const indexes = [0, 3, 5];
+      const games = { word: '_____',
+    unmaskedWord:'Banana' };
 
       gameController.updateMaskedGameWord(indexes, letter, games);
 
-      expect(games.word).toBe('_a_a_a');
+      expect(games.word).toBe('B__a_a');
     });
   });
 

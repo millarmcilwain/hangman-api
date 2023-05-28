@@ -64,8 +64,8 @@ const createGuess = (req, res) => {
 
   if (checkLetterAgainstGame(game, letter)) {
     const lettersToReplace = returnIndexArrayMatchingCharacters(
-      game,
-      letter.toLowerCase()
+      game.unmaskedWord,
+      letter
     );
 
     updateMaskedGameWord(lettersToReplace, letter, game);
@@ -74,28 +74,29 @@ const createGuess = (req, res) => {
       game.status = 'Won';
       return res
         .status(200)
-        .json({ ...clearUnmaskedWord(game), message: 'Winner! Well done!' });
+        .json({ Message: 'Winner! Well done!' , ...clearUnmaskedWord(game), });
     } else {
-      return res.status(200).json(clearUnmaskedWord(game));
+      return res.status(200).json( {Message: 'Correct guess!', ...clearUnmaskedWord(game)});
     }
   } else {
     if (checkAndDecrementGuessTotal(game)) {
       game.incorrectGuesses.push(letter);
       return res.status(200).json({
+        Message: 'Incorrect guess! Try again',
         ...clearUnmaskedWord(game),
-        message: 'Incorrect guess! Try again',
       });
     } else {
       game.status = 'Lost';
       return res
         .status(200)
         .json({
+          Message: 'Game lost! Better luck next time!',
           ...clearUnmaskedWord(game),
-          message: 'Game lost! Better luck next time!',
         });
     }
   }
 };
+
 
 const checkLetterAgainstGame = (game, letter) => {
   return game.unmaskedWord.toLowerCase().includes(letter);
@@ -105,7 +106,7 @@ const returnIndexArrayMatchingCharacters = (string, character) => {
   let indexes = [];
 
   for (i = 0; i <= string.length; i++) {
-    if (string.charAt(i) == character) {
+    if (string.toLowerCase().charAt(i) == character.toLowerCase()) {
       indexes.push(i);
     }
   }
@@ -114,11 +115,11 @@ const returnIndexArrayMatchingCharacters = (string, character) => {
 
 const updateMaskedGameWord = (indexes, letter, game) => {
   let wordArray = game.word.split('');
-
+  
   indexes.forEach((letterIndex) => {
-    wordArray[letterIndex] = letter;
+    wordArray[letterIndex] = game.unmaskedWord.charAt((letterIndex));
   });
-
+  
   game.word = wordArray.join('');
 };
 
@@ -134,8 +135,7 @@ const checkAndDecrementGuessTotal = (game) => {
 
 
 
-//check if body exists, convert to lower case, check body length? only take first value ensure letter value exists
-
+//middleware
 const verifyGameID = (req, res, next) => {
   const { gameId } = req.params;
 
