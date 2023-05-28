@@ -2,14 +2,14 @@
 
 This repository contains a REST API which can be used to play a game of 'Hangman'.
 
-# Starting a game
+## Starting a game
 ```
 POST /games/
 ```
 Making a POST request to this endpoint will create a new game and return the unique Game ID which is required for subsequent requests.
 
 
-# Checking game information
+## Checking game information
 ```
 GET /games/:game_id
 ```
@@ -28,7 +28,7 @@ status: The current play status of the game - 'Won', 'Lost', 'In Progress'
 incorrectGuesses: An array containing guessed letters that are not present in the game word.
 ```
 
-# Making a guess
+## Making a guess
 
 Invalid Game IDs
 
