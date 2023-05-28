@@ -26,7 +26,7 @@ const createGame = (req, res) => {
   };
 
   games[newGameId] = newGame;
-  res.send(newGameId);
+  res.status(201).json({newGameId: newGameId});
 };
 
 function getGame(req, res) {
@@ -51,12 +51,20 @@ const createGuess = (req, res) => {
   if (!letter || letter.length != 1) {
     return res.status(400).json({
       Message: 'Guess must be supplied with 1 letter',
+      ...clearUnmaskedWord(game),
+    });
+  }
+
+  if (game.word.includes(letter) || game.incorrectGuesses.includes(letter)) {
+    return res.status(400).json({
+      Message: `You have already submitted a guess with the letter: ${letter}!`,
+      ...clearUnmaskedWord(game),
     });
   }
 
   if (checkLetterAgainstGame(game, letter)) {
     const lettersToReplace = returnIndexArrayMatchingCharacters(
-      game.unmaskedWord.toLowerCase(),
+      game,
       letter.toLowerCase()
     );
 
@@ -64,7 +72,6 @@ const createGuess = (req, res) => {
 
     if (!checkWordCompletion(game.word)) {
       game.status = 'Won';
-
       return res
         .status(200)
         .json({ ...clearUnmaskedWord(game), message: 'Winner! Well done!' });
@@ -73,27 +80,25 @@ const createGuess = (req, res) => {
     }
   } else {
     if (checkAndDecrementGuessTotal(game)) {
+      game.incorrectGuesses.push(letter);
+      return res.status(200).json({
+        ...clearUnmaskedWord(game),
+        message: 'Incorrect guess! Try again',
+      });
+    } else {
+      game.status = 'Lost';
       return res
         .status(200)
         .json({
           ...clearUnmaskedWord(game),
-          message: 'Incorrect guess! Try again',
+          message: 'Game lost! Better luck next time!',
         });
-    } else {
-      game.status = 'Lost'
-      return res
-        .status(200)
-        .json({ ...clearUnmaskedWord(game), message: 'Game lost! Better luck next time!' });
     }
   }
 };
 
 const checkLetterAgainstGame = (game, letter) => {
-  if (game.unmaskedWord.includes(letter)) {
-    return true;
-  } else {
-    return false;
-  }
+  return game.unmaskedWord.toLowerCase().includes(letter);
 };
 
 const returnIndexArrayMatchingCharacters = (string, character) => {
@@ -118,23 +123,16 @@ const updateMaskedGameWord = (indexes, letter, game) => {
 };
 
 const checkWordCompletion = (word) => {
-  if (word.includes('_')) {
-    return true;
-  } else {
-    return false;
-  }
+  return word.includes('_');
 };
 
 const checkAndDecrementGuessTotal = (game) => {
-  
   game.remainingGuesses--;
 
-  if (game.remainingGuesses > 0) {
-    return true;
-  } else {
-    return false;
-  }
+  return game.remainingGuesses > 0;
 };
+
+
 
 //check if body exists, convert to lower case, check body length? only take first value ensure letter value exists
 
@@ -183,5 +181,5 @@ module.exports = {
   returnIndexArrayMatchingCharacters,
   updateMaskedGameWord,
   checkWordCompletion,
-  checkAndDecrementGuessTotal
+  checkAndDecrementGuessTotal,
 };

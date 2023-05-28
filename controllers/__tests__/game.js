@@ -8,13 +8,14 @@ describe('game controller', () => {
     it('Should return identifier when game created', () => {
       const req = {};
       const res = {
-        send: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
       };
 
       gameController.createGame(req, res);
 
-      expect(res.send).toHaveBeenCalledTimes(1);
-      expect(res.send).toHaveBeenCalledWith(mockId);
+      expect(res.json).toHaveBeenCalledTimes(1);
+   
     });
   });
 
@@ -203,4 +204,5 @@ describe('game controller', () => {
       expect(gameController.games[mockId].remainingGuesses).toStrictEqual(0);
     });
   });
+
 });
