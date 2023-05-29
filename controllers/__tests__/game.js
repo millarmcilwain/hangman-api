@@ -5,7 +5,7 @@ jest.mock('uuid', () => ({ v4: () => mockId }));
 
 describe('game controller', () => {
   describe('createGame', () => {
-    it('Should return identifier when game created', () => {
+    it('Should return 200 response and identifier when game created', () => {
       const req = {};
       const res = {
         status: jest.fn().mockReturnThis(),
@@ -15,6 +15,33 @@ describe('game controller', () => {
       gameController.createGame(req, res);
 
       expect(res.json).toHaveBeenCalledTimes(1);
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({newGameId: `${mockId}`});
+    });
+  });
+
+  describe('clearUnmaskedWord', () => {
+
+    const newGameWord = 'Banana';
+
+    game = {
+      remainingGuesses: 6,
+      unmaskedWord: newGameWord,
+      word: newGameWord.replaceAll(/[a-zA-Z0-9]/g, '_'),
+      status: 'In Progress',
+      incorrectGuesses: [],
+    };
+
+    it('should return game object without unmaskedWord included', () => {
+
+      const results = gameController.clearUnmaskedWord(game)
+
+      expect(results).toHaveProperty('remainingGuesses');
+      expect(results).toHaveProperty('word');
+      expect(results).toHaveProperty('status');
+      expect(results).toHaveProperty('incorrectGuesses');
+      expect(results).not.toHaveProperty('unmaskedWord');
+  
     });
   });
 
@@ -146,7 +173,6 @@ describe('game controller', () => {
   });
 
   describe('returnIndexArrayMatchingCharacters', () => {
-    
     const testString = 'Banana';
     const testLetter1 = 'a';
     const testLetter2 = 'A';
@@ -155,44 +181,56 @@ describe('game controller', () => {
 
     it('should return array with array indexes of testLetter1 (lowercase) in testString', () => {
       expect(
-        gameController.returnIndexArrayMatchingCharacters(testString, testLetter1)
+        gameController.returnIndexArrayMatchingCharacters(
+          testString,
+          testLetter1
+        )
       ).toEqual([1, 3, 5]);
     });
 
     it('should return array with array indexes of testLetter2 (uppercase) in testString', () => {
       expect(
-        gameController.returnIndexArrayMatchingCharacters(testString, testLetter2)
+        gameController.returnIndexArrayMatchingCharacters(
+          testString,
+          testLetter2
+        )
       ).toEqual([1, 3, 5]);
     });
 
     it('should return array with array indexes of testLetter3 (lowercase) in testString', () => {
       expect(
-        gameController.returnIndexArrayMatchingCharacters(testString, testLetter3)
+        gameController.returnIndexArrayMatchingCharacters(
+          testString,
+          testLetter3
+        )
       ).toEqual([0]);
     });
 
     it('should return empty array with array indexes of testLetter3 (lowercase) in testString', () => {
       expect(
-        gameController.returnIndexArrayMatchingCharacters(testString, testLetter4).length
+        gameController.returnIndexArrayMatchingCharacters(
+          testString,
+          testLetter4
+        ).length
       ).toEqual(0);
       expect(
-        gameController.returnIndexArrayMatchingCharacters(testString, testLetter4)
+        gameController.returnIndexArrayMatchingCharacters(
+          testString,
+          testLetter4
+        )
       ).toEqual([]);
     });
-
   });
 
   describe('updateMaskedGameWord', () => {
-
     beforeEach(() => {
       indexes = [1, 3, 5];
       game = { word: '_____', unmaskedWord: 'Banana' };
     });
 
-
     it('return the masked word banana with only the lowercase letter "a" showing', () => {
       const letter = 'a';
-      
+
       gameController.updateMaskedGameWord(indexes, letter, game);
 
       expect(game.word).toBe('_a_a_a');
@@ -279,7 +317,5 @@ describe('game controller', () => {
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalled();
     });
-
-   
   });
 });

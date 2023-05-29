@@ -209,6 +209,7 @@ module.exports = {
   games,
   createGame,
   getGame,
+  clearUnmaskedWord,
   createGuess,
   verifyGameID,
   checkLetterAgainstGame,
