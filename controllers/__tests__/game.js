@@ -129,7 +129,7 @@ describe('game controller', () => {
       expect(gameController.checkLetterAgainstGame(
         testGame,
         testLetterTrue
-      )).toBeTruthy();
+      )).toBe(true);
     });
 
     it('return false if the letter does not appear in the game chosen word', () => {
@@ -137,7 +137,7 @@ describe('game controller', () => {
       expect(gameController.checkLetterAgainstGame(
         testGame,
         testLetterFalse
-      )).toBeFalsy();
+      )).toBe(false);
     });
   });
 
@@ -151,13 +151,13 @@ describe('game controller', () => {
       expect(gameController.returnIndexArrayMatchingCharacters(
         string,
         testLetter1
-      )).toStrictEqual([1, 3, 5]);
+      )).toEqual([1, 3, 5]);
     });
 
     it('should return an array containing the array indexes of the letter "b" in "Banana"', () => {
       expect(
         gameController.returnIndexArrayMatchingCharacters(string, testLetter2)
-      ).toStrictEqual([0]);
+      ).toEqual([0]);
     });
   });
 
@@ -175,15 +175,16 @@ describe('game controller', () => {
   });
 
   describe('checkWordCompletion', () => {
-    const testWord1 = 'Banana';
-    const testWord2 = '_anana';
+    
+    const testWord1 = '_anana';
+    const testWord2 = 'Banana';
 
     it('should return true if an underscore is present in the word', () => {
-      expect(gameController.checkWordCompletion(testWord1)).toBeTruthy;
+      expect(gameController.checkWordCompletion(testWord1)).toBe(true);
     });
 
     it('should return false if an underscore is not present in the word', () => {
-      expect(gameController.checkWordCompletion(testWord2)).toBeFalsy;
+      expect(gameController.checkWordCompletion(testWord2)).toBe(false);
     });
   });
 
@@ -195,16 +196,40 @@ describe('game controller', () => {
 
     it('should decrement game.remainingGuesses by 1 and return true if game.remainingGuesses is greater than 0',()=>{
       gameController.games[mockId].remainingGuesses=2;
-      expect(gameController.checkAndDecrementGuessTotal(gameController.games[mockId])).toBeTruthy;
+      expect(gameController.checkAndDecrementGuessTotal(gameController.games[mockId])).toBe(true);
       expect(gameController.games[mockId].remainingGuesses).toStrictEqual(1);
     });
 
     it('should decrement game.remainingGuesses by 1 and return false when game.remainingGuesses is equal to 0',()=>{
       gameController.games[mockId].remainingGuesses=1;
-      expect(gameController.checkAndDecrementGuessTotal(gameController.games[mockId])).toBeTruthy;
-      expect(gameController.games[mockId].remainingGuesses).toStrictEqual(0);
+      expect(gameController.checkAndDecrementGuessTotal(gameController.games[mockId])).toBe(false);
+      expect(gameController.games[mockId].remainingGuesses).toEqual(0);
     });
   });
+
+  describe('checkCorrectGuessHistory', ()=>{
+    
+    const letter1 = 'B';
+    const wordTrue = 'b____';
+    const wordFalse = 'c_____';
+
+    it ('should return true if the letter is present in the game word', ()=> {
+    
+      const game = { word: wordTrue,
+     };
+      
+      expect(gameController.checkCorrectGuessHistory(game, letter1)).toBe(true);
+    });
+
+    it ('should return false if the letter is not present in the game word', ()=> {
+    
+      const game = { word: wordFalse,
+     };
+
+      expect(gameController.checkCorrectGuessHistory(game, letter1)).toBe(false);
+    });
+
+  })
 
   describe('deleteGame', ()=> {
 
@@ -220,6 +245,6 @@ describe('game controller', () => {
 
       expect(gameController.games).not.toContain(mockId);
     });
-  })
+  });
 
 });

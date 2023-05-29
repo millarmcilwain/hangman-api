@@ -145,6 +145,20 @@ const checkAndDecrementGuessTotal = (game) => {
   return game.remainingGuesses > 0;
 };
 
+const checkCorrectGuessHistory = (game, letter) => {
+
+  return game.word.toLowerCase().includes(letter.toLowerCase());
+
+}
+
+const checkIncorrectGuessHistory = (game, letter) => {
+
+  game.incorrectGuesses.forEach((incorrectGuess)=>{
+   return (incorrectGuess.toLowerCase() == letter.toLowerCase())
+  });
+
+}
+
 //middleware
 const verifyGameID = (req, res, next) => {
   const { gameId } = req.params;
@@ -198,5 +212,7 @@ module.exports = {
   updateMaskedGameWord,
   checkWordCompletion,
   checkAndDecrementGuessTotal,
-  deleteGame
+  deleteGame,
+  checkCorrectGuessHistory,
+  checkIncorrectGuessHistory
 };
