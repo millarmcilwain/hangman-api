@@ -109,7 +109,7 @@ const deleteGame = (req, res) => {
       Message: `Game ID: ${gameId} was successfully removed`,
     });
   } catch (err) {
-    //errorResponse(res);
+    errorResponse(res);
   }
 };
 
@@ -203,6 +203,8 @@ const errorResponse = (res) => {
   });
 };
 
+
+
 module.exports = {
   games,
   createGame,
@@ -217,5 +219,6 @@ module.exports = {
   checkAndDecrementGuessTotal,
   deleteGame,
   checkCorrectGuessHistory,
-  checkIncorrectGuessHistory
+  checkIncorrectGuessHistory,
+  errorResponse,
 };
