@@ -111,7 +111,7 @@ const deleteGame = (req, res) => {
 };
 
 const checkLetterAgainstGame = (game, letter) => {
-  return game.unmaskedWord.toLowerCase().includes(letter);
+  return game.unmaskedWord.toLowerCase().includes(letter.toLowerCase());
 };
 
 const returnIndexArrayMatchingCharacters = (string, character) => {

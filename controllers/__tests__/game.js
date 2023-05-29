@@ -113,7 +113,9 @@ describe('game controller', () => {
   describe('checkLetterAgainstGame', () => {
     const newGameWord = 'Banana';
     const testLetterTrue = 'a';
+    const testLetterTrueUpperCase = 'A';
     const testLetterFalse = 'x';
+
     const GUESS_LIMIT = 6;
 
     const testGame = {
@@ -124,9 +126,15 @@ describe('game controller', () => {
       incorrectGuesses: [],
     };
 
-    it('return true if the letter appears in the game chosen word', () => {
+    it('return true if the lowercase letter appears in the game chosen word', () => {
       expect(
         gameController.checkLetterAgainstGame(testGame, testLetterTrue)
+      ).toBe(true);
+    });
+
+    it('return true if the uppercase letter appears in the game chosen word', () => {
+      expect(
+        gameController.checkLetterAgainstGame(testGame, testLetterTrueUpperCase)
       ).toBe(true);
     });
 
@@ -138,39 +146,66 @@ describe('game controller', () => {
   });
 
   describe('returnIndexArrayMatchingCharacters', () => {
-    const string = 'Banana';
+    
+    const testString = 'Banana';
     const testLetter1 = 'a';
     const testLetter2 = 'A';
     const testLetter3 = 'b';
+    const testLetter4 = 'X';
 
-    it('should return an array containing the array indexes of the lowercase letter "a" in "Banana"', () => {
+    it('should return array with array indexes of testLetter1 (lowercase) in testString', () => {
       expect(
-        gameController.returnIndexArrayMatchingCharacters(string, testLetter1)
+        gameController.returnIndexArrayMatchingCharacters(testString, testLetter1)
       ).toEqual([1, 3, 5]);
     });
 
-    it('should return an array containing the array indexes of the uppercase letter "A" in "Banana"', () => {
+    it('should return array with array indexes of testLetter2 (uppercase) in testString', () => {
       expect(
-        gameController.returnIndexArrayMatchingCharacters(string, testLetter2)
+        gameController.returnIndexArrayMatchingCharacters(testString, testLetter2)
       ).toEqual([1, 3, 5]);
     });
 
-    it('should return an array containing the array indexes of the letter "b" in "Banana"', () => {
+    it('should return array with array indexes of testLetter3 (lowercase) in testString', () => {
       expect(
-        gameController.returnIndexArrayMatchingCharacters(string, testLetter3)
+        gameController.returnIndexArrayMatchingCharacters(testString, testLetter3)
       ).toEqual([0]);
     });
+
+    it('should return empty array with array indexes of testLetter3 (lowercase) in testString', () => {
+      expect(
+        gameController.returnIndexArrayMatchingCharacters(testString, testLetter4).length
+      ).toEqual(0);
+      expect(
+        gameController.returnIndexArrayMatchingCharacters(testString, testLetter4)
+      ).toEqual([]);
+    });
+
   });
 
   describe('updateMaskedGameWord', () => {
-    it('return the masked word banana with only the character "a" showing', () => {
+
+    beforeEach(() => {
+      indexes = [1, 3, 5];
+      game = { word: '_____', unmaskedWord: 'Banana' };
+    });
+
+
+    it('return the masked word banana with only the lowercase letter "a" showing', () => {
       const letter = 'a';
-      const indexes = [0, 3, 5];
-      const games = { word: '_____', unmaskedWord: 'Banana' };
+      
+      gameController.updateMaskedGameWord(indexes, letter, game);
 
-      gameController.updateMaskedGameWord(indexes, letter, games);
+      expect(game.word).toBe('_a_a_a');
+    });
 
-      expect(games.word).toBe('B__a_a');
+    it('return the masked word banana with only the lowercase letter "a" showing', () => {
+      const letter = 'A';
+      const indexes = [1, 3, 5];
+      const game = { word: '_____', unmaskedWord: 'Banana' };
+
+      gameController.updateMaskedGameWord(indexes, letter, game);
+
+      expect(game.word).toBe('_a_a_a');
     });
   });
 
