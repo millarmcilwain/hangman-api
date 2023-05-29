@@ -200,25 +200,25 @@ describe('game controller', () => {
       incorrectGuesses: [],
     };
 
-    it('return true if the lowercase letter appears in the game chosen word', () => {
+    it('return true if the letter (lowercase) appears in the game chosen word', () => {
       expect(
         gameController.checkLetterAgainstGame(testGame, testLetterTrue)
       ).toBe(true);
     });
 
-    it('return true if the uppercase letter appears in the game chosen word', () => {
+    it('return true if the letter (uppercase) appears in the game chosen word', () => {
       expect(
         gameController.checkLetterAgainstGame(testGame, testLetterTrueUpperCase)
       ).toBe(true);
     });
 
-    it('return false if the lowercase letter does not appear in the game chosen word', () => {
+    it('return false if the letter (lowercase) does not appear in the game chosen word', () => {
       expect(
         gameController.checkLetterAgainstGame(testGame, testLetterFalse)
       ).toBe(false);
     });
 
-    it('return false if the uppercase letter does not appear in the game chosen word', () => {
+    it('return false if the uppercase (uppercase) letter does not appear in the game chosen word', () => {
       expect(
         gameController.checkLetterAgainstGame(testGame, testLetterFalseUpperCase)
       ).toBe(false);
@@ -227,49 +227,65 @@ describe('game controller', () => {
 
   describe('returnIndexArrayMatchingCharacters', () => {
     const testString = 'Banana';
-    const testLetter1 = 'a';
-    const testLetter2 = 'A';
-    const testLetter3 = 'b';
-    const testLetter4 = 'X';
+    const testLetterLowercase1 = 'a';
+    const testLetterUppercase2 = 'A';
+    const testLetterLowercase3 = 'b';
+    const testLetterLowercase4 = 'x';
+    const testLetterUppercase5 = 'X';
 
-    it('should return array with array indexes of testLetter1 (lowercase) in testString', () => {
+    it('should return array with array indexes of testLetterLowercase1 (lowercase) in testString', () => {
       expect(
         gameController.returnIndexArrayMatchingCharacters(
           testString,
-          testLetter1
+          testLetterLowercase1
         )
       ).toEqual([1, 3, 5]);
     });
 
-    it('should return array with array indexes of testLetter2 (uppercase) in testString', () => {
+    it('should return array with array indexes of testLetterUppercase2 (uppercase) in testString', () => {
       expect(
         gameController.returnIndexArrayMatchingCharacters(
           testString,
-          testLetter2
+          testLetterUppercase2
         )
       ).toEqual([1, 3, 5]);
     });
 
-    it('should return array with array indexes of testLetter3 (lowercase) in testString', () => {
+    it('should return array with array indexes of testLetterLowercase3 (lowercase) in testString', () => {
       expect(
         gameController.returnIndexArrayMatchingCharacters(
           testString,
-          testLetter3
+          testLetterLowercase3
         )
       ).toEqual([0]);
     });
 
-    it('should return empty array with array indexes of testLetter3 (lowercase) in testString', () => {
+    it('should return empty array with array indexes of testLetterLowercase4 (lowercase) in testString', () => {
       expect(
         gameController.returnIndexArrayMatchingCharacters(
           testString,
-          testLetter4
+          testLetterLowercase4
         ).length
       ).toEqual(0);
       expect(
         gameController.returnIndexArrayMatchingCharacters(
           testString,
-          testLetter4
+          testLetterLowercase4
+        )
+      ).toEqual([]);
+    });
+
+    it('should return empty array with array indexes of testLetterUppercase5 (uppercase) in testString', () => {
+      expect(
+        gameController.returnIndexArrayMatchingCharacters(
+          testString,
+          testLetterUppercase5
+        ).length
+      ).toEqual(0);
+      expect(
+        gameController.returnIndexArrayMatchingCharacters(
+          testString,
+          testLetterUppercase5
         )
       ).toEqual([]);
     });
