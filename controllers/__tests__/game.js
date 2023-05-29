@@ -117,7 +117,7 @@ describe('game controller', () => {
       req = { params: { gameId: '123' } };
 
       gameController.verifyGameID(req, res, next);
-
+      expect(next).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
         Message: 'Game ID does not exist.',
