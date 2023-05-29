@@ -15,7 +15,6 @@ describe('game controller', () => {
       gameController.createGame(req, res);
 
       expect(res.json).toHaveBeenCalledTimes(1);
-   
     });
   });
 
@@ -126,37 +125,39 @@ describe('game controller', () => {
     };
 
     it('return true if the letter appears in the game chosen word', () => {
-      expect(gameController.checkLetterAgainstGame(
-        testGame,
-        testLetterTrue
-      )).toBe(true);
+      expect(
+        gameController.checkLetterAgainstGame(testGame, testLetterTrue)
+      ).toBe(true);
     });
 
     it('return false if the letter does not appear in the game chosen word', () => {
-     
-      expect(gameController.checkLetterAgainstGame(
-        testGame,
-        testLetterFalse
-      )).toBe(false);
+      expect(
+        gameController.checkLetterAgainstGame(testGame, testLetterFalse)
+      ).toBe(false);
     });
   });
 
   describe('returnIndexArrayMatchingCharacters', () => {
     const string = 'Banana';
     const testLetter1 = 'a';
-    const testLetter2 = 'b';
+    const testLetter2 = 'A';
+    const testLetter3 = 'b';
 
-    it('should return an array containing the array indexes of the letter "a" in "Banana"', () => {
-  
-      expect(gameController.returnIndexArrayMatchingCharacters(
-        string,
-        testLetter1
-      )).toEqual([1, 3, 5]);
+    it('should return an array containing the array indexes of the lowercase letter "a" in "Banana"', () => {
+      expect(
+        gameController.returnIndexArrayMatchingCharacters(string, testLetter1)
+      ).toEqual([1, 3, 5]);
+    });
+
+    it('should return an array containing the array indexes of the uppercase letter "A" in "Banana"', () => {
+      expect(
+        gameController.returnIndexArrayMatchingCharacters(string, testLetter2)
+      ).toEqual([1, 3, 5]);
     });
 
     it('should return an array containing the array indexes of the letter "b" in "Banana"', () => {
       expect(
-        gameController.returnIndexArrayMatchingCharacters(string, testLetter2)
+        gameController.returnIndexArrayMatchingCharacters(string, testLetter3)
       ).toEqual([0]);
     });
   });
@@ -165,8 +166,7 @@ describe('game controller', () => {
     it('return the masked word banana with only the character "a" showing', () => {
       const letter = 'a';
       const indexes = [0, 3, 5];
-      const games = { word: '_____',
-    unmaskedWord:'Banana' };
+      const games = { word: '_____', unmaskedWord: 'Banana' };
 
       gameController.updateMaskedGameWord(indexes, letter, games);
 
@@ -175,7 +175,6 @@ describe('game controller', () => {
   });
 
   describe('checkWordCompletion', () => {
-    
     const testWord1 = '_anana';
     const testWord2 = 'Banana';
 
@@ -188,51 +187,49 @@ describe('game controller', () => {
     });
   });
 
-  describe('checkAndDecrementGuessTotal', ()=>{
-
+  describe('checkAndDecrementGuessTotal', () => {
     beforeEach(() => {
-      gameController.games[mockId]={remainingGuesses:{}}
+      gameController.games[mockId] = { remainingGuesses: {} };
     });
 
-    it('should decrement game.remainingGuesses by 1 and return true if game.remainingGuesses is greater than 0',()=>{
-      gameController.games[mockId].remainingGuesses=2;
-      expect(gameController.checkAndDecrementGuessTotal(gameController.games[mockId])).toBe(true);
+    it('should decrement game.remainingGuesses by 1 and return true if game.remainingGuesses is greater than 0', () => {
+      gameController.games[mockId].remainingGuesses = 2;
+      expect(
+        gameController.checkAndDecrementGuessTotal(gameController.games[mockId])
+      ).toBe(true);
       expect(gameController.games[mockId].remainingGuesses).toStrictEqual(1);
     });
 
-    it('should decrement game.remainingGuesses by 1 and return false when game.remainingGuesses is equal to 0',()=>{
-      gameController.games[mockId].remainingGuesses=1;
-      expect(gameController.checkAndDecrementGuessTotal(gameController.games[mockId])).toBe(false);
+    it('should decrement game.remainingGuesses by 1 and return false when game.remainingGuesses is equal to 0', () => {
+      gameController.games[mockId].remainingGuesses = 1;
+      expect(
+        gameController.checkAndDecrementGuessTotal(gameController.games[mockId])
+      ).toBe(false);
       expect(gameController.games[mockId].remainingGuesses).toEqual(0);
     });
   });
 
-  describe('checkCorrectGuessHistory', ()=>{
-    
+  describe('checkCorrectGuessHistory', () => {
     const letter1 = 'B';
     const wordTrue = 'b____';
     const wordFalse = 'c_____';
 
-    it ('should return true if the letter is present in the game word', ()=> {
-    
-      const game = { word: wordTrue,
-     };
-      
+    it('should return true if the letter is present in the game word', () => {
+      const game = { word: wordTrue };
+
       expect(gameController.checkCorrectGuessHistory(game, letter1)).toBe(true);
     });
 
-    it ('should return false if the letter is not present in the game word', ()=> {
-    
-      const game = { word: wordFalse,
-     };
+    it('should return false if the letter is not present in the game word', () => {
+      const game = { word: wordFalse };
 
-      expect(gameController.checkCorrectGuessHistory(game, letter1)).toBe(false);
+      expect(gameController.checkCorrectGuessHistory(game, letter1)).toBe(
+        false
+      );
     });
+  });
 
-  })
-
-  describe('deleteGame', ()=> {
-
+  describe('deleteGame', () => {
     req = { params: { gameId: mockId } };
     res = {
       status: jest.fn().mockReturnThis(),
@@ -240,11 +237,10 @@ describe('game controller', () => {
     };
     gameController.games[mockId] = {};
 
-    it('should return a JSON response with a 200 status if the game has sucessfully been removed', ()=> {
+    it('should return a JSON response with a 200 status if the game has sucessfully been removed', () => {
       gameController.deleteGame();
 
       expect(gameController.games).not.toContain(mockId);
     });
   });
-
 });

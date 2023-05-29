@@ -55,7 +55,7 @@ const createGuess = (req, res) => {
     });
   }
 
-  if (game.word.includes(letter) || game.incorrectGuesses.includes(letter)) {
+  if (checkCorrectGuessHistory(game, letter) || checkIncorrectGuessHistory(game, letter)) {
     return res.status(400).json({
       Message: `You have already submitted a guess with the letter: ${letter}!`,
       ...clearUnmaskedWord(game),
