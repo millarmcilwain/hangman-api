@@ -15,6 +15,7 @@ const clearUnmaskedWord = (game) => {
 };
 
 const createGame = (req, res) => {
+  try{
   const newGameWord = retrieveWord();
   const newGameId = uuid();
   const newGame = {
@@ -27,18 +28,25 @@ const createGame = (req, res) => {
 
   games[newGameId] = newGame;
   res.status(201).json({ newGameId: newGameId });
+} catch(err) {
+  return errorResponse(res);
+}
 };
 
-function getGame(req, res) {
-  const { gameId } = req.params;
+const getGame = (req, res) => {
+  try {
+    const { gameId } = req.params;
 
-  var game = games[gameId];
-  if (!game) {
-    return res.sendStatus(404);
+    var game = games[gameId];
+    if (!game) {
+      throw new Error ('Game not found');
+    }
+
+    return res.status(200).json(clearUnmaskedWord(game));
+  } catch (err) {
+    return errorResponse(res);
   }
-
-  return res.status(200).json(clearUnmaskedWord(game));
-}
+};
 
 const createGuess = (req, res) => {
   const { gameId } = req.params;
@@ -55,7 +63,10 @@ const createGuess = (req, res) => {
     });
   }
 
-  if (checkCorrectGuessHistory(game, letter) || checkIncorrectGuessHistory(game, letter)) {
+  if (
+    checkCorrectGuessHistory(game, letter) ||
+    checkIncorrectGuessHistory(game, letter)
+  ) {
     return res.status(400).json({
       Message: `You have already submitted a guess with the letter: ${letter}!`,
       ...clearUnmaskedWord(game),
@@ -103,8 +114,6 @@ const deleteGame = (req, res) => {
 
     delete games[gameId];
 
-    console.log('test');
-    console.log(games)
     return res.status(200).json({
       Message: `Game ID: ${gameId} was successfully removed`,
     });
@@ -149,18 +158,23 @@ const checkAndDecrementGuessTotal = (game) => {
 };
 
 const checkCorrectGuessHistory = (game, letter) => {
-
   return game.word.toLowerCase().includes(letter.toLowerCase());
-
-}
+};
 
 const checkIncorrectGuessHistory = (game, letter) => {
+  
+  let result = false;
 
-  game.incorrectGuesses.forEach((incorrectGuess)=>{
-   return (incorrectGuess.toLowerCase() == letter.toLowerCase())
-  });
+  game.incorrectGuesses.forEach((incorrectGuess) => {
+    if (incorrectGuess.toLowerCase() === letter.toLowerCase()) {
+      result = true;
+    }
+  })
 
-}
+  return result;
+
+
+};
 
 //middleware
 const verifyGameID = (req, res, next) => {
@@ -203,10 +217,9 @@ const errorResponse = (res) => {
   });
 };
 
-
-
 module.exports = {
   games,
+  retrieveWord,
   createGame,
   getGame,
   clearUnmaskedWord,

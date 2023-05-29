@@ -4,6 +4,14 @@ const mockId = 'fda56100-0ddb-4f06-9ea4-7c1919ff6d2f';
 jest.mock('uuid', () => ({ v4: () => mockId }));
 
 describe('game controller', () => {
+  describe('retrieveWord', () => {
+    it('should return single word that is present in word array', () => {
+      const result = gameController.retrieveWord();
+
+      expect(['Banana', 'Airport', 'Unosquare', 'Canine']).toContain(result);
+    });
+  });
+
   describe('createGame', () => {
     it('Should return 200 response and identifier when game created', () => {
       const req = {};
@@ -16,12 +24,38 @@ describe('game controller', () => {
 
       expect(res.json).toHaveBeenCalledTimes(1);
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith({newGameId: `${mockId}`});
+      expect(res.json).toHaveBeenCalledWith({ newGameId: `${mockId}` });
     });
   });
 
-  describe('clearUnmaskedWord', () => {
+  describe('getGame', () => {
 
+    it('should return game object with 200', () => {
+      req = { params: { gameId: mockId } };
+      res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+      gameController.games[mockId] = {
+        remainingGuesses: 6,
+        word: 'Banana',
+        status: 'In Progress',
+        incorrectGuesses: [],
+      };
+
+      gameController.getGame(req, res);
+
+      expect(res.json).toHaveBeenCalledTimes(1);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        remainingGuesses: 6,
+        word: 'Banana',
+        status: 'In Progress',
+        incorrectGuesses: [],
+      });
+    });
+
+  });
+
+  describe('clearUnmaskedWord', () => {
     const newGameWord = 'Banana';
 
     game = {
@@ -32,16 +66,14 @@ describe('game controller', () => {
       incorrectGuesses: [],
     };
 
-    it('should return game object without unmaskedWord included', () => {
-
-      const results = gameController.clearUnmaskedWord(game)
+    it('should return object without unmaskedWord property', () => {
+      const results = gameController.clearUnmaskedWord(game);
 
       expect(results).toHaveProperty('remainingGuesses');
       expect(results).toHaveProperty('word');
       expect(results).toHaveProperty('status');
       expect(results).toHaveProperty('incorrectGuesses');
       expect(results).not.toHaveProperty('unmaskedWord');
-  
     });
   });
 
@@ -61,7 +93,7 @@ describe('game controller', () => {
 
     gameController.games[mockId] = {};
 
-    it('should return a JSON response with a 404 status if the gameID is not present in the request', () => {
+    it('should return a JSON with 404 if the gameID is not present in the request', () => {
       gameController.verifyGameID(req, res, next);
       expect(next).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(404);
@@ -71,7 +103,7 @@ describe('game controller', () => {
       });
     });
 
-    it('should call next() if the gameId exists', () => {
+    it('should call next() if gameId exists', () => {
       req = { params: { gameId: mockId } };
 
       gameController.verifyGameID(req, res, next);
@@ -81,7 +113,7 @@ describe('game controller', () => {
       expect(res.json).not.toHaveBeenCalled();
     });
 
-    it('should return a JSON response with a 404 status if the gameID does not exist', () => {
+    it('should return JSON with 404 if gameID does not exist', () => {
       req = { params: { gameId: '123' } };
 
       gameController.verifyGameID(req, res, next);
@@ -108,7 +140,7 @@ describe('game controller', () => {
       gameController.games[mockId] = { status: '' };
     });
 
-    it('should return a JSON response with a 404 status if the game status does not equal "In Progress"', () => {
+    it('should return JSON with 404 if game.status equals "Won"', () => {
       req = { params: { gameId: mockId } };
 
       gameController.games[mockId] = { status: 'Won' };
@@ -122,7 +154,21 @@ describe('game controller', () => {
       });
     });
 
-    it('should call next if game status equa;s "In Progress"', () => {
+    it('should return JSON with 404 if game.status equals "Lost"', () => {
+      req = { params: { gameId: mockId } };
+
+      gameController.games[mockId] = { status: 'Lost' };
+
+      gameController.verifyGameStatus(req, res, next);
+
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({
+        Message: `Game ID: ${mockId} has already been completed`,
+      });
+    });
+
+    it('should call next if game status equals "In Progress"', () => {
       req = { params: { gameId: mockId } };
 
       gameController.games[mockId] = { status: 'In Progress' };
@@ -297,6 +343,36 @@ describe('game controller', () => {
       const game = { word: wordFalse };
 
       expect(gameController.checkCorrectGuessHistory(game, letter1)).toBe(
+        false
+      );
+    });
+  });
+
+  describe('checkIncorrectGuessHistory', () => {
+    const letter1 = 'B';
+    const letter2 = 'x';
+ 
+    const game = { incorrectGuesses: ['a', 'B', 'c'] };
+    const emptyGame = {incorrectGuesses: []};
+
+    it('should return true if the letter is present in the incorrectGuesses array', () => {
+      
+
+      expect(gameController.checkIncorrectGuessHistory(game, letter1)).toBe(true);
+    });
+
+    it('should return false if the letter is not present in the incorrectGuesses array', () => {
+     
+
+      expect(gameController.checkIncorrectGuessHistory(game, letter2)).toBe(
+        false
+      );
+    });
+
+    it('should return false if the incorrectGuessesArray is empty', () => {
+     
+
+      expect(gameController.checkIncorrectGuessHistory(emptyGame, letter2)).toBe(
         false
       );
     });
