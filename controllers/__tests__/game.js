@@ -188,6 +188,7 @@ describe('game controller', () => {
     const testLetterTrue = 'a';
     const testLetterTrueUpperCase = 'A';
     const testLetterFalse = 'x';
+    const testLetterFalseUpperCase = 'X';
 
     const GUESS_LIMIT = 6;
 
@@ -211,9 +212,15 @@ describe('game controller', () => {
       ).toBe(true);
     });
 
-    it('return false if the letter does not appear in the game chosen word', () => {
+    it('return false if the lowercase letter does not appear in the game chosen word', () => {
       expect(
         gameController.checkLetterAgainstGame(testGame, testLetterFalse)
+      ).toBe(false);
+    });
+
+    it('return false if the uppercase letter does not appear in the game chosen word', () => {
+      expect(
+        gameController.checkLetterAgainstGame(testGame, testLetterFalseUpperCase)
       ).toBe(false);
     });
   });
