@@ -273,9 +273,12 @@ describe('game controller', () => {
     gameController.games[mockId] = {};
 
     it('should return a JSON response with a 200 status if the game has sucessfully been removed', () => {
-      gameController.deleteGame();
+      gameController.deleteGame(req, res);
 
-      expect(gameController.games).not.toContain(mockId);
+      expect(gameController.games).not.toHaveProperty(mockId);
+      expect(gameController.games).toEqual({});
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalled();
     });
   });
 });

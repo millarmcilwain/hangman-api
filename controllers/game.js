@@ -102,6 +102,9 @@ const deleteGame = (req, res) => {
     const { gameId } = req.params;
 
     delete games[gameId];
+
+    console.log('test');
+    console.log(games)
     return res.status(200).json({
       Message: `Game ID: ${gameId} was successfully removed`,
     });
