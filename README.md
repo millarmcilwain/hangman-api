@@ -15,7 +15,7 @@ GET /games/:game_id
 ```
 A GET request containing the Game ID made to this endpoint will return information associated with the supplied Game ID.
 
-If a Game ID is not supplied or does not exist in the API dataset a 404 status will be returned with a contextual message.
+If a Game ID is not supplied or does not exist in storage a 404 status will be returned with a contextual message.
 
 A successful request will return:
 ```
@@ -38,3 +38,9 @@ Invalid Game IDs
 Correct Gueses
 
 Incorrect Guesses
+
+## Deleting a game
+```
+DELETE /games/remove/:game_id
+```
+A DELETE request containing the Game ID made to this endpoint will remove the game associated with the ID from storage. Be careful as this action is irreversible.
