@@ -118,7 +118,7 @@ const deleteGame = (req, res) => {
 
     delete games[gameId];
 
-    return res.status(200).json({
+    return res.status(204).json({
       Message: `Game ID: ${gameId} was successfully removed`,
     });
   } catch (err) {

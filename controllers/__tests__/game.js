@@ -629,7 +629,7 @@ describe('game controller', () => {
       gameController.deleteGame(req, res);
       expect(gameController.games).not.toHaveProperty(mockId);
       expect(gameController.games).toEqual({});
-      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.status).toHaveBeenCalledWith(204);
       expect(res.json).toHaveBeenCalled();
     });
   });
