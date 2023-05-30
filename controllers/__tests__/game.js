@@ -29,10 +29,9 @@ describe('game controller', () => {
   });
 
   describe('getGame', () => {
-
-    it('should return game object with 200', () => {
-      req = { params: { gameId: mockId } };
-      res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+    it('should return game object with 200 status', () => {
+      const req = { params: { gameId: mockId } };
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
 
       gameController.games[mockId] = {
         remainingGuesses: 6,
@@ -52,7 +51,209 @@ describe('game controller', () => {
         incorrectGuesses: [],
       });
     });
+  });
 
+  describe('createGuess', () => {
+    const testLetterLowercase = 'c';
+    const testLetterUppercase = 'X';
+
+    beforeEach(() => {
+      let req = {};
+      let res = {};
+
+      gameController.games[mockId] = {
+        remainingGuesses: 6,
+        unmaskedWord: 'Canine',
+        word: '______',
+        status: 'In Progress',
+        incorrectGuesses: [],
+      };
+    });
+
+    it('should return a JSON and 500 status when a game with the supplied ID cannot be found ', () => {
+      const req = {
+        params: { gameId: mockId },
+        body: { letter: testLetterLowercase },
+      };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
+      delete gameController.games[mockId];
+
+      gameController.createGuess(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({
+        Message: 'There was an issue processing this request',
+      });
+    });
+
+    it('should return a JSON and 400 status if no letter paramter is supplied in the body of the request ', () => {
+      const req = {
+        params: { gameId: mockId },
+        body: { letter: '' },
+      };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
+      gameController.createGuess(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        Message: 'Guess must be supplied with 1 letter',
+        remainingGuesses: 6,
+        word: '______',
+        status: 'In Progress',
+        incorrectGuesses: [],
+        
+      });
+    });
+
+    it('should return a JSON and 400 status if a previous correct guess with the supplied letter has been made ', () => {
+      const req = {
+        params: { gameId: mockId },
+        body: { letter: testLetterLowercase },
+      };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+      gameController.games[mockId].word = 'C_____';
+
+      gameController.createGuess(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        Message: `You have already submitted a guess with the letter: ${testLetterLowercase}!`,
+        remainingGuesses: 6,
+        word: 'C_____',
+        status: 'In Progress',
+        incorrectGuesses: [],
+        
+      });
+    });
+
+    it('should return a JSON and 400 status if a previous incorrect guess with the supplied letter has been made ', () => {
+      const req = {
+        params: { gameId: mockId },
+        body: { letter: testLetterLowercase },
+      };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+      gameController.games[mockId].incorrectGuesses = ['c'];
+
+      gameController.createGuess(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        Message: `You have already submitted a guess with the letter: ${testLetterLowercase}!`,
+        remainingGuesses: 6,
+        word: '______',
+        status: 'In Progress',
+        incorrectGuesses: ['c'],
+        
+      });
+    });
+
+    it('should return a JSON, 200 status and set status to Won when the game word has been fully guessed', () => {
+      const req = {
+        params: { gameId: mockId },
+        body: { letter: testLetterLowercase },
+      };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
+      gameController.games[mockId].word = '_anine';
+
+      gameController.createGuess(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        Message: 'Winner! Well done!',
+        remainingGuesses: 6,
+        word: 'Canine',
+        status: 'Won',
+        incorrectGuesses: [],
+      });
+    });
+
+    it('should return a JSON and 200 status when a letter in the selected game word is guessed', () => {
+      const req = {
+        params: { gameId: mockId },
+        body: { letter: testLetterLowercase },
+      };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
+      gameController.createGuess(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        Message: 'Correct guess!',
+        remainingGuesses: 6,
+        word: 'C_____',
+        status: 'In Progress',
+        incorrectGuesses: [],
+      });
+    });
+
+    it('should return a JSON and 200 status, decrement the remainingGuesses value by 1 and add the supplied letter to the incorrectGuesses array when an incorrect letter is supplied', () => {
+      const req = {
+        params: { gameId: mockId },
+        body: { letter: testLetterUppercase },
+      };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
+      gameController.createGuess(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        Message: 'Incorrect guess! Try again',
+        remainingGuesses: 5,
+        word: '______',
+        status: 'In Progress',
+        incorrectGuesses: ['X',],
+      });
+    });
+
+    it('should return a JSON, 200 status, and set the status to 0 if remainingGuesses = 0', () => {
+      const req = {
+        params: { gameId: mockId },
+        body: { letter: testLetterUppercase },
+      };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
+      gameController.games[mockId].remainingGuesses=1;
+
+      gameController.createGuess(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        Message: 'Game lost! Better luck next time!',
+        remainingGuesses: 0,
+        word: '______',
+        status: 'Lost',
+        incorrectGuesses: ['X',],
+      });
+    });
+
+    
   });
 
   describe('clearUnmaskedWord', () => {
@@ -220,7 +421,10 @@ describe('game controller', () => {
 
     it('return false if the uppercase (uppercase) letter does not appear in the game chosen word', () => {
       expect(
-        gameController.checkLetterAgainstGame(testGame, testLetterFalseUpperCase)
+        gameController.checkLetterAgainstGame(
+          testGame,
+          testLetterFalseUpperCase
+        )
       ).toBe(false);
     });
   });
@@ -297,7 +501,7 @@ describe('game controller', () => {
       game = { word: '_____', unmaskedWord: 'Banana' };
     });
 
-    it('return the masked word banana with only the lowercase letter "a" showing', () => {
+    it('should return the masked word with all instances of letter (lowercase) showing', () => {
       const letter = 'a';
 
       gameController.updateMaskedGameWord(indexes, letter, game);
@@ -305,7 +509,7 @@ describe('game controller', () => {
       expect(game.word).toBe('_a_a_a');
     });
 
-    it('return the masked word banana with only the lowercase letter "a" showing', () => {
+    it('should return the masked word with all instances of letter (uppercase) showing', () => {
       const letter = 'A';
       const indexes = [1, 3, 5];
       const game = { word: '_____', unmaskedWord: 'Banana' };
@@ -318,20 +522,25 @@ describe('game controller', () => {
 
   describe('checkWordCompletion', () => {
     const testWord1 = '_anana';
-    const testWord2 = 'Banana';
+    const testWord2 = '_a_a_a';
+    const testWord3 = 'Banana';
 
     it('should return true if an underscore is present in the word', () => {
       expect(gameController.checkWordCompletion(testWord1)).toBe(true);
     });
 
+    it('should return true if multiple underscores are present in the word', () => {
+      expect(gameController.checkWordCompletion(testWord2)).toBe(true);
+    });
+
     it('should return false if an underscore is not present in the word', () => {
-      expect(gameController.checkWordCompletion(testWord2)).toBe(false);
+      expect(gameController.checkWordCompletion(testWord3)).toBe(false);
     });
   });
 
   describe('checkAndDecrementGuessTotal', () => {
     beforeEach(() => {
-      gameController.games[mockId] = { remainingGuesses: {} };
+      gameController.games[mockId] = {};
     });
 
     it('should decrement game.remainingGuesses by 1 and return true if game.remainingGuesses is greater than 0', () => {
@@ -339,7 +548,7 @@ describe('game controller', () => {
       expect(
         gameController.checkAndDecrementGuessTotal(gameController.games[mockId])
       ).toBe(true);
-      expect(gameController.games[mockId].remainingGuesses).toStrictEqual(1);
+      expect(gameController.games[mockId].remainingGuesses).toEqual(1);
     });
 
     it('should decrement game.remainingGuesses by 1 and return false when game.remainingGuesses is equal to 0', () => {
@@ -352,58 +561,65 @@ describe('game controller', () => {
   });
 
   describe('checkCorrectGuessHistory', () => {
-    const letter1 = 'B';
+    const letterLowercase = 'b';
+    const letterUppercase = 'B';
     const wordTrue = 'b____';
     const wordFalse = 'c_____';
 
-    it('should return true if the letter is present in the game word', () => {
+    it('should return true if the letter (lowercase) is present in the game word', () => {
       const game = { word: wordTrue };
 
-      expect(gameController.checkCorrectGuessHistory(game, letter1)).toBe(true);
+      expect(
+        gameController.checkCorrectGuessHistory(game, letterLowercase)
+      ).toBe(true);
+    });
+
+    it('should return true if the letter (uppercase) is present in the game word', () => {
+      const game = { word: wordTrue };
+
+      expect(
+        gameController.checkCorrectGuessHistory(game, letterUppercase)
+      ).toBe(true);
     });
 
     it('should return false if the letter is not present in the game word', () => {
       const game = { word: wordFalse };
 
-      expect(gameController.checkCorrectGuessHistory(game, letter1)).toBe(
-        false
-      );
+      expect(
+        gameController.checkCorrectGuessHistory(game, letterLowercase)
+      ).toBe(false);
     });
   });
 
   describe('checkIncorrectGuessHistory', () => {
     const letter1 = 'B';
     const letter2 = 'x';
- 
+
     const game = { incorrectGuesses: ['a', 'B', 'c'] };
-    const emptyGame = {incorrectGuesses: []};
+    const emptyGame = { incorrectGuesses: [] };
 
     it('should return true if the letter is present in the incorrectGuesses array', () => {
-      
-
-      expect(gameController.checkIncorrectGuessHistory(game, letter1)).toBe(true);
+      expect(gameController.checkIncorrectGuessHistory(game, letter1)).toBe(
+        true
+      );
     });
 
     it('should return false if the letter is not present in the incorrectGuesses array', () => {
-     
-
       expect(gameController.checkIncorrectGuessHistory(game, letter2)).toBe(
         false
       );
     });
 
     it('should return false if the incorrectGuessesArray is empty', () => {
-     
-
-      expect(gameController.checkIncorrectGuessHistory(emptyGame, letter2)).toBe(
-        false
-      );
+      expect(
+        gameController.checkIncorrectGuessHistory(emptyGame, letter2)
+      ).toBe(false);
     });
   });
 
   describe('deleteGame', () => {
-    req = { params: { gameId: mockId } };
-    res = {
+    const req = { params: { gameId: mockId } };
+    const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };

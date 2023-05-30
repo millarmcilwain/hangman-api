@@ -38,9 +38,7 @@ const getGame = (req, res) => {
     const { gameId } = req.params;
 
     var game = games[gameId];
-    if (!game) {
-      throw new Error ('Game not found');
-    }
+    if (!game) throw new Error('Game not found');
 
     return res.status(200).json(clearUnmaskedWord(game));
   } catch (err) {
@@ -49,12 +47,14 @@ const getGame = (req, res) => {
 };
 
 const createGuess = (req, res) => {
+  try {
+  
   const { gameId } = req.params;
   const { letter } = req.body;
 
   let game = games[gameId];
 
-  if (!game) return res.sendStatus(404);
+  if (!game) throw new Error('Game not found');
 
   if (!letter || letter.length != 1) {
     return res.status(400).json({
@@ -99,6 +99,7 @@ const createGuess = (req, res) => {
         ...clearUnmaskedWord(game),
       });
     } else {
+      game.incorrectGuesses.push(letter);
       game.status = 'Lost';
       return res.status(200).json({
         Message: 'Game lost! Better luck next time!',
@@ -106,6 +107,9 @@ const createGuess = (req, res) => {
       });
     }
   }
+} catch (err) {
+  return errorResponse(res);
+}
 };
 
 const deleteGame = (req, res) => {
