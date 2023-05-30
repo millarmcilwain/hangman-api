@@ -2,6 +2,30 @@
 
 This repository contains a REST API which can be used to play a game of 'Hangman'. This API allows for creating new games, checking game information, submitting guesses and deleting existing games.
 
+## Install
+```
+npm install
+```
+
+## Run the App
+```
+npm start
+```
+
+## Run the Tests
+```
+npm test
+```
+
+The app will run on port 4567
+
+## Gameplay
+
+This API follows adopts the traditional ruleset and game proceedure to ['Hangman'](https://en.wikipedia.org/wiki/Hangman_(game)) with some exceptions: 
+
+1. Users are allowed a total of 6 incorrect guesses before the game is lost. 
+2. A user may use each letter one per game (regardless of case). Additional guesses with a previously guessed letter will not count towards progress.
+
 ## Starting a game
 ```
 POST /games/
@@ -29,15 +53,17 @@ incorrectGuesses: An array containing guessed letters that are not present in th
 ```
 
 ## Making a guess
+```
+POST /games/:game_id/guesses
+```
+To submit a guess to the API a valid Game ID must be provided alongside a 'letter' (case insensitive) paramater in the request body.  
 
-Invalid Game IDs
+A correct guess will return a status 200 and an updated game object with the correctly guessed letters unmasked from the game word.
+An incorrect guess will return a status 200 and an updated game object with changes to the amount of remaining guesses and an array containing the letters of incorrect guesses.
 
+If all correct letters are guessed the game status will be set to 'Won' and no more guesses can be submitted. 
+If 6 incorrect guesses are made the game status will be set to 'Lost' and no more guesses can be submitted.
 
-
-
-Correct Gueses
-
-Incorrect Guesses
 
 ## Deleting a game
 ```
