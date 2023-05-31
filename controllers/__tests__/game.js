@@ -109,7 +109,6 @@ describe('game controller', () => {
         word: '______',
         status: 'In Progress',
         incorrectGuesses: [],
-        
       });
     });
 
@@ -133,7 +132,6 @@ describe('game controller', () => {
         word: 'C_____',
         status: 'In Progress',
         incorrectGuesses: [],
-        
       });
     });
 
@@ -157,7 +155,6 @@ describe('game controller', () => {
         word: '______',
         status: 'In Progress',
         incorrectGuesses: ['c'],
-        
       });
     });
 
@@ -225,7 +222,7 @@ describe('game controller', () => {
         remainingGuesses: 5,
         word: '______',
         status: 'In Progress',
-        incorrectGuesses: ['X',],
+        incorrectGuesses: ['X'],
       });
     });
 
@@ -239,7 +236,7 @@ describe('game controller', () => {
         json: jest.fn(),
       };
 
-      gameController.games[mockId].remainingGuesses=1;
+      gameController.games[mockId].remainingGuesses = 1;
 
       gameController.createGuess(req, res);
 
@@ -249,11 +246,9 @@ describe('game controller', () => {
         remainingGuesses: 0,
         word: '______',
         status: 'Lost',
-        incorrectGuesses: ['X',],
+        incorrectGuesses: ['X'],
       });
     });
-
-    
   });
 
   describe('clearUnmaskedWord', () => {
@@ -630,7 +625,9 @@ describe('game controller', () => {
       expect(gameController.games).not.toHaveProperty(mockId);
       expect(gameController.games).toEqual({});
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({Message: `Game ID: ${mockId} was successfully removed`,});
+      expect(res.json).toHaveBeenCalledWith({
+        Message: `Game ID: ${mockId} was successfully removed`,
+      });
     });
   });
 });

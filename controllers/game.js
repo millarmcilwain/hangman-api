@@ -15,22 +15,22 @@ const clearUnmaskedWord = (game) => {
 };
 
 const createGame = (req, res) => {
-  try{
-  const newGameWord = retrieveWord();
-  const newGameId = uuid();
-  const newGame = {
-    remainingGuesses: GUESS_LIMIT,
-    unmaskedWord: newGameWord,
-    word: newGameWord.replaceAll(/[a-zA-Z0-9]/g, '_'),
-    status: 'In Progress',
-    incorrectGuesses: [],
-  };
+  try {
+    const newGameWord = retrieveWord();
+    const newGameId = uuid();
+    const newGame = {
+      remainingGuesses: GUESS_LIMIT,
+      unmaskedWord: newGameWord,
+      word: newGameWord.replaceAll(/[a-zA-Z0-9]/g, '_'),
+      status: 'In Progress',
+      incorrectGuesses: [],
+    };
 
-  games[newGameId] = newGame;
-  res.status(201).json({ newGameId: newGameId });
-} catch(err) {
-  return errorResponse(res);
-}
+    games[newGameId] = newGame;
+    res.status(201).json({ newGameId: newGameId });
+  } catch (err) {
+    return errorResponse(res);
+  }
 };
 
 const getGame = (req, res) => {
@@ -48,68 +48,67 @@ const getGame = (req, res) => {
 
 const createGuess = (req, res) => {
   try {
-  
-  const { gameId } = req.params;
-  const { letter } = req.body;
+    const { gameId } = req.params;
+    const { letter } = req.body;
 
-  let game = games[gameId];
+    let game = games[gameId];
 
-  if (!game) throw new Error('Game not found');
+    if (!game) throw new Error('Game not found');
 
-  if (!letter || letter.length != 1) {
-    return res.status(400).json({
-      Message: 'Guess must be supplied with 1 letter',
-      ...clearUnmaskedWord(game),
-    });
-  }
-
-  if (
-    checkCorrectGuessHistory(game, letter) ||
-    checkIncorrectGuessHistory(game, letter)
-  ) {
-    return res.status(400).json({
-      Message: `You have already submitted a guess with the letter: ${letter}!`,
-      ...clearUnmaskedWord(game),
-    });
-  }
-
-  if (checkLetterAgainstGame(game, letter)) {
-    const lettersToReplace = returnIndexArrayMatchingCharacters(
-      game.unmaskedWord,
-      letter
-    );
-
-    updateMaskedGameWord(lettersToReplace, letter, game);
-
-    if (!checkWordCompletion(game.word)) {
-      game.status = 'Won';
-      return res
-        .status(200)
-        .json({ Message: 'Winner! Well done!', ...clearUnmaskedWord(game) });
-    } else {
-      return res
-        .status(200)
-        .json({ Message: 'Correct guess!', ...clearUnmaskedWord(game) });
-    }
-  } else {
-    if (checkAndDecrementGuessTotal(game)) {
-      game.incorrectGuesses.push(letter);
-      return res.status(200).json({
-        Message: 'Incorrect guess! Try again',
-        ...clearUnmaskedWord(game),
-      });
-    } else {
-      game.incorrectGuesses.push(letter);
-      game.status = 'Lost';
-      return res.status(200).json({
-        Message: 'Game lost! Better luck next time!',
+    if (!letter || letter.length != 1) {
+      return res.status(400).json({
+        Message: 'Guess must be supplied with 1 letter',
         ...clearUnmaskedWord(game),
       });
     }
+
+    if (
+      checkCorrectGuessHistory(game, letter) ||
+      checkIncorrectGuessHistory(game, letter)
+    ) {
+      return res.status(400).json({
+        Message: `You have already submitted a guess with the letter: ${letter}!`,
+        ...clearUnmaskedWord(game),
+      });
+    }
+
+    if (checkLetterAgainstGame(game, letter)) {
+      const lettersToReplace = returnIndexArrayMatchingCharacters(
+        game.unmaskedWord,
+        letter
+      );
+
+      updateMaskedGameWord(lettersToReplace, letter, game);
+
+      if (!checkWordCompletion(game.word)) {
+        game.status = 'Won';
+        return res
+          .status(200)
+          .json({ Message: 'Winner! Well done!', ...clearUnmaskedWord(game) });
+      } else {
+        return res
+          .status(200)
+          .json({ Message: 'Correct guess!', ...clearUnmaskedWord(game) });
+      }
+    } else {
+      if (checkAndDecrementGuessTotal(game)) {
+        game.incorrectGuesses.push(letter);
+        return res.status(200).json({
+          Message: 'Incorrect guess! Try again',
+          ...clearUnmaskedWord(game),
+        });
+      } else {
+        game.incorrectGuesses.push(letter);
+        game.status = 'Lost';
+        return res.status(200).json({
+          Message: 'Game lost! Better luck next time!',
+          ...clearUnmaskedWord(game),
+        });
+      }
+    }
+  } catch (err) {
+    return errorResponse(res);
   }
-} catch (err) {
-  return errorResponse(res);
-}
 };
 
 const deleteGame = (req, res) => {
@@ -166,18 +165,15 @@ const checkCorrectGuessHistory = (game, letter) => {
 };
 
 const checkIncorrectGuessHistory = (game, letter) => {
-  
   let result = false;
 
   game.incorrectGuesses.forEach((incorrectGuess) => {
     if (incorrectGuess.toLowerCase() === letter.toLowerCase()) {
       result = true;
     }
-  })
+  });
 
   return result;
-
-
 };
 
 //middleware
