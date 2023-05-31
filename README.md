@@ -25,7 +25,7 @@ The app will run on port 4567.
 ```
 POST /games/
 ```
-Making a POST request to this endpoint will create a new game and return the unique Game ID which is required for subsequent requests.
+Making a POST request to this endpoint will create a new game and return the unique Game ID which is required for subsequent requests. Guesses may now be made on the returned Game ID.
 
 
 ## Checking game information
