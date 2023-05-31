@@ -499,7 +499,7 @@ describe('game controller', () => {
     it('should return the masked word with all instances of letter (lowercase) showing', () => {
       const letter = 'a';
 
-      gameController.updateMaskedGameWord(indexes, letter, game);
+      gameController.updateMaskedGameWord(indexes, game);
 
       expect(game.word).toBe('_a_a_a');
     });
@@ -509,7 +509,7 @@ describe('game controller', () => {
       const indexes = [1, 3, 5];
       const game = { word: '_____', unmaskedWord: 'Banana' };
 
-      gameController.updateMaskedGameWord(indexes, letter, game);
+      gameController.updateMaskedGameWord(indexes, game);
 
       expect(game.word).toBe('_a_a_a');
     });

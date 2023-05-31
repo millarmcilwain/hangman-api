@@ -78,7 +78,7 @@ const createGuess = (req, res) => {
         letter
       );
 
-      updateMaskedGameWord(lettersToReplace, letter, game);
+      updateMaskedGameWord(lettersToReplace,game);
 
       if (!checkWordCompletion(game.word)) {
         game.status = 'Won';
@@ -140,7 +140,7 @@ const returnIndexArrayMatchingCharacters = (string, character) => {
   return indexes;
 };
 
-const updateMaskedGameWord = (indexes, letter, game) => {
+const updateMaskedGameWord = (indexes, game) => {
   let wordArray = game.word.split('');
 
   indexes.forEach((letterIndex) => {
