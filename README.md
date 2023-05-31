@@ -17,14 +17,8 @@ npm start
 npm test
 ```
 
-The app will run on port 4567
+The app will run on port 4567.
 
-## Gameplay
-
-This API follows adopts the traditional ruleset and game proceedure to ['Hangman'](https://en.wikipedia.org/wiki/Hangman_(game)) with some exceptions: 
-
-1. Users are allowed a total of 6 incorrect guesses before the game is lost. 
-2. A user may use each letter one per game (regardless of case). Additional guesses with a previously guessed letter will not count towards progress.
 
 ## Starting a game
 ```
