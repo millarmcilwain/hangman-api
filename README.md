@@ -3,6 +3,7 @@
 This repository contains a REST API which can be used to play a game of 'Hangman'. This API allows for creating new games, checking game information, submitting guesses and deleting existing games.
 
 ## Install
+Ensure Node packages are installed before starting the application.
 ```
 npm install
 ```
